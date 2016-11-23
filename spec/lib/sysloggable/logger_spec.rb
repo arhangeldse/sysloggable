@@ -2,7 +2,8 @@ require "spec_helper"
 
 describe Sysloggable::Logger do
   let(:syslogger) { spy("syslogger") }
-  subject(:logger) { described_class.new(ident: "test_ident") }
+  let(:options) { {ident: "test_ident"} }
+  subject(:logger) { described_class.new(options) }
 
   before do
     Sysloggable::Container.stub('lib.syslogger', syslogger)
@@ -31,5 +32,18 @@ describe Sysloggable::Logger do
     end
 
     Timecop.return
+  end
+
+
+  context "custom separator" do
+    let(:options) { {ident: "test_ident", separator: " | "} }
+
+    it do
+      expect(syslogger).to receive(:add).
+        with(described_class::SEVERITIES[:info],
+             "severity=INFO | service=test_ident | operation= | duration=0 | message=msg")
+
+      logger.info("msg")
+    end
   end
 end

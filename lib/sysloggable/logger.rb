@@ -59,9 +59,10 @@ module Sysloggable
         message: message
       }.merge!(params)
 
-      result.each_with_object(String.new) do |(key, value), memo|
-        memo << " " << "#{key}=#{value}"
-      end.strip!
+      result.
+        map { |key, value| "#{key}=#{value}" }.
+        join(@options.fetch(:separator, " ")).
+        strip
     end
   end
 end
